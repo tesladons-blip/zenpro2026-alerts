@@ -24,10 +24,10 @@ import requests
 # SECTION 1 — CREDENTIALS  (read from GitHub Secrets, never hardcode)
 # ═══════════════════════════════════════════════════════════════
 
-DHAN_CLIENT_ID    = os.environ.get("DHAN_CLIENT_ID", "")
-DHAN_ACCESS_TOKEN = os.environ.get("DHAN_ACCESS_TOKEN", "")
-TELEGRAM_TOKEN    = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID  = os.environ.get("TELEGRAM_CHAT_ID", "")
+DHAN_CLIENT_ID    = os.environ.get("DHAN_CLIENT_ID",    "").strip()
+DHAN_ACCESS_TOKEN = os.environ.get("DHAN_ACCESS_TOKEN", "").strip()
+TELEGRAM_TOKEN    = os.environ.get("TELEGRAM_BOT_TOKEN","").strip()
+TELEGRAM_CHAT_ID  = os.environ.get("TELEGRAM_CHAT_ID",  "").strip()
 
 # ═══════════════════════════════════════════════════════════════
 # SECTION 2 — SIGNAL SWITCHES  (True = enabled, False = skip)
