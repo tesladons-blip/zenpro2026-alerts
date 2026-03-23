@@ -599,6 +599,9 @@ def is_market_open() -> bool:
 
 def run():
     print("=" * 50)
+    print(f"CLIENT_ID=[{DHAN_CLIENT_ID}]")
+    print(f"TOKEN_LENGTH={len(DHAN_ACCESS_TOKEN)}")
+    print(f"TOKEN_START={DHAN_ACCESS_TOKEN[:10]}")
     print(f"ZenPro2026 Signal Engine  —  {datetime.now()}")
     print("=" * 50)
 
