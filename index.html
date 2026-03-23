@@ -49,7 +49,7 @@ body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospa
 
 /* PAGES */
 .page{display:none;flex:1;overflow:hidden;}
-.page.active{display:flex;}
+.page.active{display:flex;} #page-multi.active{display:grid;}
 
 /* ══ CHART PAGE ══ */
 #page-chart{flex-direction:row;}
@@ -160,7 +160,7 @@ body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospa
 .si-t{color:var(--text3);}
 
 /* ══ MULTI CHART PAGE ══ */
-#page-multi{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;padding:4px;background:var(--bg);overflow:hidden;}
+#page-multi{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;padding:4px;background:var(--bg);overflow:hidden;}
 .mc-panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;display:flex;flex-direction:column;}
 .mc-header{height:32px;display:flex;align-items:center;padding:0 8px;gap:6px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .mc-sym{font-size:10px;font-weight:600;}
@@ -701,7 +701,15 @@ async function loadSymbol(item,tf){
 
     // SIGNALS — clean arrows
     const sigs=detectSignals(rows);
-    const markers=sigs.flatMap(s=>s.fired.map(f=>({time:toD(s.time),position:f.d==='BUY'?'belowBar':'aboveBar',color:f.d==='BUY'?'#00e5a0':'#ff4d6a',shape:f.d==='BUY'?'arrowUp':'arrowDown',size:1})));
+    // Only show signals from last 120 bars to keep chart clean
+    const recentSigs = sigs.filter(s => s.idx >= rows.length - 120);
+    // Also deduplicate — only show strongest signal per 3-bar window
+    const dedupedSigs = [];
+    let lastBarShown = -10;
+    recentSigs.forEach(s => {
+      if(s.idx - lastBarShown >= 3){ dedupedSigs.push(s); lastBarShown = s.idx; }
+    });
+    const markers=dedupedSigs.flatMap(s=>s.fired.slice(0,1).map(f=>({time:toD(s.time),position:f.d==='BUY'?'belowBar':'aboveBar',color:f.d==='BUY'?'#00e5a0':'#ff4d6a',shape:f.d==='BUY'?'arrowUp':'arrowDown',size:1})));
     candleSeries.setMarkers(markers);
 
     // BUY/SELL ZONE BANDS via price lines
@@ -939,7 +947,10 @@ async function loadMCChart(idx,item){
     mc.e21.setData(rows.map((r,i)=>({time:toD(r.time),value:e21v[i]})));
     // Signals
     const sigs=detectSignals(rows);
-    mc.candle.setMarkers(sigs.flatMap(s=>s.fired.map(f=>({time:toD(s.time),position:f.d==='BUY'?'belowBar':'aboveBar',color:f.d==='BUY'?'#00e5a0':'#ff4d6a',shape:f.d==='BUY'?'arrowUp':'arrowDown',size:1}))));
+    const mcRecent=sigs.filter(s=>s.idx>=rows.length-80);
+    const mcDedup=[];let mcLast=-10;
+    mcRecent.forEach(s=>{if(s.idx-mcLast>=4){mcDedup.push(s);mcLast=s.idx;}});
+    mc.candle.setMarkers(mcDedup.flatMap(s=>s.fired.slice(0,1).map(f=>({time:toD(s.time),position:f.d==='BUY'?'belowBar':'aboveBar',color:f.d==='BUY'?'#00e5a0':'#ff4d6a',shape:f.d==='BUY'?'arrowUp':'arrowDown',size:1}))));
     mc.chart.timeScale().fitContent();
     const last=rows.length-1;
     const pr=rows[last].close,prev=rows[last-1]?.close||pr;
