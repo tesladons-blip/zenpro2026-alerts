@@ -1,0 +1,51 @@
+name: ZenPro2026 Signal Engine
+
+on:
+  schedule:
+    - cron: "*/5 3-9 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  run-signals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-zenpro-v1
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install requests pandas numpy pytz
+
+      - name: Run ZenPro2026 signal engine
+        env:
+          DHAN_CLIENT_ID:     ${{ secrets.DHAN_CLIENT_ID }}
+          DHAN_ACCESS_TOKEN:  ${{ secrets.DHAN_ACCESS_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python signal_engine.py
+
+      - name: Save cooldown state
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cooldown-state
+          path: cooldown_state.json
+          retention-days: 1
+          if-no-files-found: ignore
