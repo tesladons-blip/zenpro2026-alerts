@@ -34,8 +34,6 @@ jobs:
 
       - name: Run ZenPro2026 signal engine
         env:
-          DHAN_CLIENT_ID:     ${{ secrets.DHAN_CLIENT_ID }}
-          DHAN_ACCESS_TOKEN:  ${{ secrets.DHAN_ACCESS_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -50,3 +48,16 @@ jobs:
           path: cooldown_state.json
           retention-days: 1
           if-no-files-found: ignore
+```
+
+---
+
+## Step 3 — Run Workflow and You Should See ✅
+```
+Processing RELIANCE (RELIANCE.NS)...
+  Fetched 498 daily bars
+  No signals fired
+
+Processing NIFTY50 (^NSEI)...
+  Fetched 495 daily bars
+  No signals fired
