@@ -2,13 +2,13 @@ name: ZenPro2026 Signal Engine
 
 on:
   schedule:
-    - cron: "*/5 3-9 * * 1-5"
+    - cron: "*/30 3-10 * * 1-5"
   workflow_dispatch:
 
 jobs:
   run-signals:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repo
@@ -25,7 +25,7 @@ jobs:
       - name: Run signal engine
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python signal_engine.py
 
       - name: Save cooldown state
